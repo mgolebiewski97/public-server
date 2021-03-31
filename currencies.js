@@ -1,17 +1,21 @@
+const currencyMap = new Map();
+currencyMap.set('PLN', 'zł');
+currencyMap.set('USD', '$');
+currencyMap.set('EUR', '€');
 
 document.getElementsByClassName('site-header')[0].innerHTML += '<div style="padding: 10px; display:flex;' +
   ' justify-content: center; align-items: center; position: absolute; top: 100px; z-index: 1;' +
   ' right: 100px; border-radius: 15px; background-color: lightgrey">' +
   '<select onchange="onCurrencySelectChange()" id="currency-select">' +
-    '<option selected="' + getSelectedCurrencyFromMemory() === 'PLN' ? 'seleceted' : '' ' +">PLN</option>' +
-    '<option selected="selected">EUR</option>' +
-    '<option>USD</option>' +
+    '<option ' + (getSelectedCurrencyFromMemory() === 'PLN' ? 'selected' : '') + '>PLN</option>' +
+    '<option ' + (getSelectedCurrencyFromMemory() === 'EUR' ? 'selected' : '') + '>EUR</option>' +
+    '<option ' + (getSelectedCurrencyFromMemory() === 'USD' ? 'selected' : '') + '>USD</option>' +
   '</select>' +
   '</div>';
-
+rewritePrices(document.getElementById('currency-select').value);
 
 function onCurrencySelectChange() {
-  let value = document.getElementById('currency-select').value
+  let value = document.getElementById('currency-select').value;
   console.log(value)
   rewritePrices(value)
 }
@@ -24,27 +28,17 @@ function setSelectedCurrency(currency) {
   localStorage.setItem('selected-currency', currency)
 }
 
-var currencyMap = new Map();
-currencyMap.set('PLN', 'zł')
-currencyMap.set('USD', '$')
-currencyMap.set('EUR', '€')
-
-function calculateAmount(value, toCurrency, fromCurrency) {
-  console.log(value);
-
-  return parseFloat(value.replace(',', '.')) * 2.0;
-}
-
 function rewritePrices(newCurrencyCode) {
-  let elements = Array.from(document.getElementsByClassName('money'))
+  let elements = Array.from(document.getElementsByClassName('money'));
   console.log(elements);
   for (let x = 0; x < elements.length; x++) {
-    let value = document.getElementsByClassName('money')[x].innerHTML
-    let moneyValue = parseFloat(value.replace( /^\D+/g, '').replace(',', '.'))
+    let value = document.getElementsByClassName('money')[x].innerHTML;
+    let moneyValue = parseFloat(value.replace( /^\D+/g, '').replace(',', '.'));
     let currencySuffix = value.replace(/[0-9]/g, '').replace(/,/g,"").replace(/\./g,"").trim();
-    let currencyCode = getKey(currencySuffix)
+    let currencyCode = getKey(currencySuffix);
+    setSelectedCurrency(newCurrencyCode);
 
-    if (!isNaN(roundedMoneyValue)) {
+    if (!isNaN(moneyValue)) {
       let url = "http://api.openrates.io/latest?base=" + currencyCode;
       console.log(url);
       fetch(url)
